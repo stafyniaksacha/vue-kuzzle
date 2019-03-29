@@ -4,52 +4,115 @@ This plugin simply exposes the Kuzzle SDK in your Vuejs components.
 
 ## Getting started
 
-Install the plugin via
+Install both of kuzzle-sdk (@>6.0.0) and this vue plugin via
 
 ```bash
-npm install vue-kuzzle
+npm install --save kuzzle-sdk vue-kuzzle
 ```
 
 Then, in your Vuejs application, you need to register the plugin in your `Vue` class.
 
 ```javascript
-import VueKuzzle from 'vue-kuzzle';
+import { Kuzzle, Websocket } from 'kuzzle-sdk';
+import VuePluginKuzzle from 'vue-kuzzle';
 
-Vue.use(VueKuzzle, options);
+const kuzzle = new Kuzzle(
+  new WebSocket('kuzzle.example.com', { sslConnection: true })
+);
+
+Vue.use(VuePluginKuzzle, kuzzle);
 ```
 
-Where `options` may contain the following options.
+## Accessing the Kuzzle SDK instance
 
-### `options.backends`
+### `vue` component
 
-An object of available backends to connect to. Backends are POJOs of the following form (the example shows the default config):
+You'll be able to access the shared Kuzzle SDK instance from any components using `this.$kuzzle` in any `Vue` instance
 
 ```javascript
-options.backends = {
-  local: {
-    host: 'localhost',
-    options: {
-      port: 7512,
-      sslConnection: false
+Vue.component('my-component', {
+  data() {
+    return {
+      roomId: null,
+    }
+  },
+  methods: {
+    subscribe() {
+      this.roomId = await this.$kuzzle.realtime.subscribe(
+        'index',
+        'collection',
+        {},
+        notification => {
+          console.log(`received notification: ${notification}`);
+        }
+      );
     }
   }
-};
+});
 ```
 
-The plugin will instantiate the Kuzzle SDK with the `Websocket` protocol, choosing among the available backends based on the `process.env.VUE_APP_BACKEND` environment variable. If this variable is not specified, the `local` backend is choosen as fallback.
+### `vuex` store
 
-**Warning** Don't forget to `connect()` your instance before performing any actions.
-
-## Accessing the Kuzzle SDK instance within the app
-
-You'll be able to access the Kuzzle SDK instance from the components as
+You'll be able to access the shared Kuzzle SDK instance from any other file (like a `vuex` store)
 
 ```javascript
-this.$kuzzle;
+import VuePluginKuzzle from 'vue-kuzzle';
+
+async function doThing() {
+  const results = VuePluginKuzzle.kuzzle.document.search(
+    'index',
+    'collection',
+    {}
+  );
+}
 ```
 
-And from anywhere in your app where the `Vue` class is available, as
+## Register kuzzle events listener
 
 ```javascript
-Vue.prototype.$kuzzle;
+Vue.component('my-component', {
+  data() {
+    return {
+      documents: [],
+    }
+  },
+  kuzzle: {
+    async connected() {
+      this.search()
+    },
+    async reconnected() {
+      this.search()
+    }
+  },
+  methods: {
+    search() {
+      const response = await this.$kuzzle.document.search(
+        'index',
+        'collection',
+        {}
+      );
+
+      this.documents = response.hits;
+    }
+  }
+});
+```
+
+## Switching connection & protocols
+
+You might need to switch connection betweed differents servers.
+You can set the `this.$kuzzle` property by a new instance of `Kuzzle`, the plugin will try to connect the new instance if a previous connection was open.
+
+```javascript
+import { Kuzzle, Websocket } from 'kuzzle-sdk';
+
+Vue.component('my-component', {
+  methods: {
+    connectToArchive() {
+      this.$kuzzle = new Kuzzle(
+        new WebSoket('archive.kuzzle.example.com', { sslConnection: true })
+      );
+    }
+  }
+});
 ```
