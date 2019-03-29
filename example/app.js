@@ -2,15 +2,7 @@ import Vue from 'vue';
 import { Kuzzle, WebSocket } from 'kuzzle-sdk';
 import VuePluginKuzzle from '../dist/vue-plugin-kuzzle';
 
-Vue.use(
-  VuePluginKuzzle,
-  new Kuzzle(
-    new WebSocket('kuzzle.sporticy.com', {
-      port: '7512',
-      sslConnection: true
-    })
-  )
-);
+Vue.use(VuePluginKuzzle);
 
 new Vue({
   el: '#app',
@@ -27,11 +19,11 @@ new Vue({
       this.$kuzzle.disconnect();
     },
     switchLocalServer() {
-      this.$kuzzle = new Kuzzle(new WebSocket('172.20.0.2'));
+      this.$kuzzle = new Kuzzle(new WebSocket('127.0.0.1'));
     },
     switchRemoteServer() {
       this.$kuzzle = new Kuzzle(
-        new WebSocket('kuzzle.sporticy.com', {
+        new WebSocket('127.0.0.1', {
           port: '7512',
           sslConnection: true
         })
