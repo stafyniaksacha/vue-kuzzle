@@ -41,7 +41,7 @@
     }
   ],
   "dependencies": {
-    "kuzzle-sdk": "^6.0.0",
+    "kuzzle-sdk": "^6.1.0",
     "vue": "^2.6.10"
   },
   "devDependencies": {

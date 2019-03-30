@@ -12,7 +12,7 @@
 export default {
   name: 'KuzzleDocumentSubscribe',
   props: {
-    hit: {
+    searchHit: {
       type: Object,
       required: true
     },
@@ -30,7 +30,7 @@ export default {
     }
   },
   created () {
-    this.syncedSource = this.hit._source
+    this.syncedSource = this.searchHit._source
   },
   beforeDestroy () {
     if (this.roomId) {
@@ -48,18 +48,18 @@ export default {
 
       try {
         this.roomId = await this.$kuzzle.realtime.subscribe(
-          this.hit._index,
-          this.hit._type,
+          this.searchHit._index,
+          this.searchHit._type,
           {
             ids: {
-              values: [this.hit._id]
+              values: [this.searchHit._id]
             }
           }, notification => {
             this.syncedSource = notification.result._source
           })
       }
       catch (error) {
-        this.syncedSource = this.hit._source;
+        this.syncedSource = this.searchHit._source;
         this.error = error;
       }
       finally {

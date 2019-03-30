@@ -8,7 +8,7 @@ new Vue({
   el: '#app',
   data() {
     return {
-      isConnected: false
+      isComponentConnected: false
     };
   },
   methods: {
@@ -31,32 +31,32 @@ new Vue({
     }
   },
   template: `<div>
-    <span v-if="isConnected">connected</span>
+    <span v-if="isComponentConnected">connected</span>
     <span v-else>disconnected</span>
     <button @click="connect">connect</button>
     <button @click="disconnect">disconnect</button>
     <button @click="switchLocalServer">switch local server</button>
     <button @click="switchRemoteServer">switch remote server</button>
-    <KuzzleDocumentSearch index="sporticy" collection="sports" v-slot="{ hits, total, loading, error }">
+    <KuzzleDocumentSearch index="my-index" collection="my-collection" v-slot="{ hits, total, loading, error }">
       {{ total }}
       {{ loading }}
       {{ error }}
       <ul>
         <li v-for="hit in hits">
-          <KuzzleDocumentSubscribe :hit="hit" v-slot="{ syncedSource }">{{ syncedSource }}</KuzzleDocumentSubscribe>
+          <KuzzleDocumentSubscribe :search-hit="hit" v-slot="{ syncedSource }">{{ syncedSource }}</KuzzleDocumentSubscribe>
         </li>
       </ul>
     </KuzzleDocumentSearch>
   </div>`,
   kuzzle: {
     async connected() {
-      this.isConnected = true;
+      this.isComponentConnected = true;
     },
     async reconnected() {
-      this.isConnected = true;
+      this.isComponentConnected = true;
     },
     async disconnected() {
-      this.isConnected = false;
+      this.isComponentConnected = false;
     }
   }
 });
