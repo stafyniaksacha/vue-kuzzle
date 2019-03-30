@@ -131,14 +131,14 @@ Vue.component('my-component', {
 
 ### KuzzleDocumentSearch
 
-```javascript
+```vue
 <template>
   <KuzzleDocumentSearch
     index="my-index"
     collection="my-collection"
     query="{}"
     options="{}"
-    v-slot="{ hits, total, loading, error }"
+    v-slot="{ hits, total, loading, error }"
   >
     <span>total: {{ total }}</span>
     <span>is loading: {{ loading }}</span>
@@ -152,7 +152,7 @@ Vue.component('my-component', {
 
 ### KuzzleDocumentSubscribe
 
-```javascript
+```vue
 <template>
   <KuzzleDocumentSubscribe
     search-hit="{}"
